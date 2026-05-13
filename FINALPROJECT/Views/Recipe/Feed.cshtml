@@ -1,0 +1,210 @@
+@model FINALPROJECT.ViewModels.RecipeFeedViewModel
+@using FINALPROJECT.Models
+@{
+    ViewData["Title"] = "Discover Recipes";
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="row g-4">
+
+        <!-- Sidebar Filters -->
+        <div class="col-lg-3 col-xl-2">
+            <div class="filter-sidebar">
+                <form asp-controller="Recipe" asp-action="Feed" method="get" id="filterForm">
+                    <h5 class="fw-bold mb-4">Filters</h5>
+
+                    <!-- Category -->
+                    <div class="filter-section">
+                        <div class="filter-label">Category</div>
+                        @foreach (RecipeCategory cat in Enum.GetValues(typeof(RecipeCategory)))
+                        {
+                            var label = cat switch {
+                                RecipeCategory.BreakfastBrunch => "Breakfast & Brunch",
+                                RecipeCategory.MainDishes => "Main Dishes",
+                                RecipeCategory.Desserts => "Desserts",
+                                RecipeCategory.SnacksApps => "Snacks & Apps",
+                                _ => cat.ToString()
+                            };
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="category" value="@((int)cat)"
+                                       id="cat_@cat" @(Model.Category == cat ? "checked" : "") />
+                                <label class="form-check-label small" for="cat_@cat">@label</label>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Difficulty -->
+                    <div class="filter-section">
+                        <div class="filter-label">Difficulty</div>
+                        <div class="tab-pills flex-wrap">
+                            @foreach (Difficulty d in Enum.GetValues(typeof(Difficulty)))
+                            {
+                                <a href="javascript:void(0)"
+                                   onclick="setDifficulty(@((int)d))"
+                                   class="tab-pill @(Model.Difficulty == d ? "active" : "")">@d</a>
+                            }
+                        </div>
+                        <input type="hidden" name="difficulty" id="difficultyInput" value="@((int?)Model.Difficulty)" />
+                    </div>
+
+                    <!-- Cooking Time -->
+                    <div class="filter-section">
+                        <div class="filter-label d-flex justify-content-between">
+                            <span>Cooking Time</span>
+                            <span class="text-primary-color fw-semibold" id="timeLabel">
+                                @(Model.MaxTime.HasValue ? (Model.MaxTime >= 120 ? "120+ min" : Model.MaxTime + " min") : "Any")
+                            </span>
+                        </div>
+                        <input type="range" class="form-range mt-2" min="5" max="120" step="5"
+                               name="maxTime" id="timeRange"
+                               value="@(Model.MaxTime ?? 120)"
+                               oninput="document.getElementById('timeLabel').textContent = (this.value >= 120 ? '120+ min' : this.value + ' min')" />
+                        <div class="d-flex justify-content-between small text-muted mt-1">
+                            <span>5 min</span><span>120+ min</span>
+                        </div>
+                    </div>
+
+                    <!-- Dietary -->
+                    <div class="filter-section">
+                        <div class="filter-label">Dietary</div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="small mb-0" for="isVeg">Vegetarian</label>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="isVeg" name="isVeg" value="true" @(Model.IsVegetarian ? "checked" : "") />
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="small mb-0" for="isVegan">Vegan</label>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="isVegan" name="isVegan" value="true" @(Model.IsVegan ? "checked" : "") />
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label class="small mb-0" for="isGF">Gluten-Free</label>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="isGF" name="isGF" value="true" @(Model.IsGlutenFree ? "checked" : "") />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-flavorly w-100 rounded-pill py-2 fw-semibold">
+                        Apply Filters
+                    </button>
+                    <div class="text-center mt-2">
+                        <a asp-controller="Recipe" asp-action="Feed" class="small text-muted text-decoration-none">Clear all filters</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 col-xl-10">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                <div>
+                    <h2 class="mb-0 fw-bold">Discover Recipes</h2>
+                    <p class="text-muted mb-0 small">Showing @Model.Recipes.Count() of @Model.TotalCount delicious meals</p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small text-muted">Sort by</span>
+                    <select class="form-select form-select-sm rounded-pill" style="width:auto;"
+                            onchange="this.form.submit()" name="sortBy" form="filterForm">
+                        <option value="newest"  @(Model.SortBy=="newest"  ? "selected":"")>Newest</option>
+                        <option value="rating"  @(Model.SortBy=="rating"  ? "selected":"")>Most Popular</option>
+                        <option value="time"    @(Model.SortBy=="time"    ? "selected":"")>Quickest</option>
+                        <option value="oldest"  @(Model.SortBy=="oldest"  ? "selected":"")>Oldest</option>
+                    </select>
+                </div>
+            </div>
+
+            @if (!Model.Recipes.Any())
+            {
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+                    <h4>No flavors found for this search.</h4>
+                    <p class="text-muted">We couldn't find any recipes matching your criteria. Try using broader keywords or different ingredients.</p>
+                    <a asp-controller="Recipe" asp-action="Feed" class="btn btn-dark rounded-pill px-4 me-2">Try another search</a>
+                    <a asp-controller="Recipe" asp-action="Feed" class="small text-muted text-decoration-none">Browse Popular Recipes</a>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var recipe in Model.Recipes)
+                    {
+                        <div class="col-sm-6 col-xl-4">
+                            <div class="recipe-card">
+                                <div class="recipe-card-img-wrap">
+                                    <img src="@recipe.HeroImageUrl" alt="@recipe.Title"
+                                         onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80'" />
+                                    <span class="card-time-badge">
+                                        <i class="bi bi-clock me-1"></i>@(recipe.PrepTime + recipe.CookTime) Min
+                                    </span>
+                                    @if (recipe.IsVegan)
+                                    { <span class="card-tag-badge card-tag-vegan">VEGAN</span> }
+                                    else if (recipe.IsVegetarian)
+                                    { <span class="card-tag-badge card-tag-healthy">HEALTHY</span> }
+                                    else if (recipe.Reviews.Count >= 2)
+                                    { <span class="card-tag-badge card-tag-trending">TRENDING</span> }
+                                    <button class="card-bookmark"><i class="bi bi-heart"></i></button>
+                                </div>
+                                <div class="recipe-card-body">
+                                    <a asp-controller="Recipe" asp-action="Detail" asp-route-id="@recipe.Id" class="text-decoration-none text-dark">
+                                        <h6 class="fw-semibold mb-1">@recipe.Title</h6>
+                                    </a>
+                                    <div class="d-flex align-items-center justify-content-between mt-2">
+                                        <div class="card-author">
+                                            <img src="@(recipe.Author?.AvatarUrl ?? "/images/default-avatar.png")" alt="avatar"
+                                                 onerror="this.src='https://ui-avatars.com/api/?name=Chef&background=C8622A&color=fff&size=32'" />
+                                            <span>@(recipe.Author?.DisplayName ?? "Chef")</span>
+                                        </div>
+                                        @if (recipe.Reviews.Any())
+                                        {
+                                            <div class="star-rating">
+                                                <i class="bi bi-star-fill"></i>
+                                                <span class="fw-semibold">@recipe.AverageRating.ToString("0.0")</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="mt-5 d-flex justify-content-center">
+                        <ul class="pagination gap-1">
+                            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link rounded-pill" asp-action="Feed"
+                                   asp-route-page="@(Model.CurrentPage - 1)"
+                                   asp-route-sortBy="@Model.SortBy"><i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            @for (int p = 1; p <= Model.TotalPages; p++)
+                            {
+                                <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link rounded-pill" asp-action="Feed"
+                                       asp-route-page="@p" asp-route-sortBy="@Model.SortBy">@p</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link rounded-pill" asp-action="Feed"
+                                   asp-route-page="@(Model.CurrentPage + 1)"
+                                   asp-route-sortBy="@Model.SortBy"><i class="bi bi-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function setDifficulty(val) {
+    document.getElementById('difficultyInput').value = val;
+}
+</script>
+}

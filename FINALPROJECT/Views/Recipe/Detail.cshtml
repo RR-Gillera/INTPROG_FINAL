@@ -1,0 +1,209 @@
+@model FINALPROJECT.ViewModels.RecipeDetailViewModel
+@using FINALPROJECT.Models
+@{
+    ViewData["Title"] = Model.Recipe.Title;
+    var r = Model.Recipe;
+    var stars = (int)Math.Round(r.AverageRating);
+}
+
+<div class="detail-hero">
+    <img src="@r.HeroImageUrl" alt="@r.Title" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80'" />
+    <div class="detail-hero-overlay"></div>
+    <div class="detail-hero-title">
+        <small class="text-white opacity-75 small text-uppercase">Recipes / @r.Category</small>
+        <h1 class="mt-1 text-white">@r.Title</h1>
+        <div class="d-flex align-items-center gap-3 mt-2">
+            <img src="@(r.Author?.AvatarUrl ?? "/images/default-avatar.png")" class="rounded-circle" width="34" height="34" style="object-fit:cover;border:2px solid rgba(255,255,255,.5)" onerror="this.src='https://ui-avatars.com/api/?name=Chef&background=C8622A&color=fff&size=34'" alt="avatar"/>
+            <span class="text-white small fw-semibold">@(r.Author?.DisplayName ?? "Chef")</span>
+            <div class="ms-auto d-flex gap-2">
+                <button class="btn btn-sm btn-outline-light rounded-pill"><i class="bi bi-heart me-1"></i>Save</button>
+                <button class="btn btn-sm btn-outline-light rounded-pill"><i class="bi bi-share me-1"></i>Share</button>
+                <button class="btn btn-sm btn-outline-light rounded-pill" onclick="window.print()"><i class="bi bi-printer"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-3">
+    <div class="meta-bar">
+        <div class="meta-item"><div class="meta-value"><i class="bi bi-clock text-primary-color me-1"></i>@r.PrepTime min</div><div class="meta-label">Prep Time</div></div>
+        <div class="meta-item"><div class="meta-value"><i class="bi bi-fire text-primary-color me-1"></i>@r.CookTime min</div><div class="meta-label">Cook Time</div></div>
+        <div class="meta-item"><div class="meta-value"><i class="bi bi-people text-primary-color me-1"></i>@r.Servings</div><div class="meta-label">Servings</div></div>
+        <div class="meta-item"><div class="meta-value"><i class="bi bi-bar-chart text-primary-color me-1"></i>@r.Difficulty</div><div class="meta-label">Difficulty</div></div>
+        @if (r.Reviews.Any())
+        {
+            <div class="meta-item">
+                <div class="star-rating meta-value">
+                    @for (int i = 1; i <= 5; i++) { <i class="bi @(i <= stars ? "bi-star-fill" : "bi-star")"></i> }
+                    <span class="text-muted ms-1" style="font-size:.9rem;">@r.AverageRating.ToString("0.0")</span>
+                </div>
+                <div class="meta-label">@r.Reviews.Count Reviews</div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <div class="mb-4 p-4 rounded-3" style="background:#F5F0EB;border-left:4px solid var(--primary);">
+                <p class="mb-0 fst-italic">"@r.Description"</p>
+            </div>
+
+            <div class="mb-5">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h3>Ingredients</h3>
+                    <a href="#" class="small text-primary-color text-decoration-none fw-semibold"><i class="bi bi-plus me-1"></i>Add to grocery list</a>
+                </div>
+                <div class="row g-2">
+                    @foreach (var ing in r.Ingredients)
+                    {
+                        <div class="col-md-6">
+                            <label class="ingredient-check w-100">
+                                <input type="checkbox" onchange="this.closest('.ingredient-check').classList.toggle('checked',this.checked)" />
+                                <span>@ing.Text</span>
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <h3 class="mb-4">Preparation Steps</h3>
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var step in r.Steps)
+                    {
+                        <div class="step-card">
+                            <div class="step-number">@step.StepNumber.ToString("D2")</div>
+                            <div><h6 class="fw-bold mb-1">@step.Title</h6><p class="text-muted mb-0 small">@step.Description</p></div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="chef-tips-card mb-5">
+                <h5 class="fw-bold text-success mb-3"><i class="bi bi-lightbulb-fill me-2"></i>Chef's Tips</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex gap-2 mb-2"><i class="bi bi-check-circle-fill text-success mt-1"></i><span>Read the entire recipe before you start cooking.</span></li>
+                    <li class="d-flex gap-2 mb-2"><i class="bi bi-check-circle-fill text-success mt-1"></i><span>Prep all ingredients (mise en place) before you begin.</span></li>
+                    <li class="d-flex gap-2"><i class="bi bi-check-circle-fill text-success mt-1"></i><span>Season to taste at every stage — don't wait until the end.</span></li>
+                </ul>
+            </div>
+
+            <div class="mb-5">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h3 class="mb-0">Reviews &amp; Ratings</h3>
+                        @if (r.Reviews.Any())
+                        {
+                            <div class="d-flex align-items-baseline gap-2 mt-1">
+                                <span class="rating-big">@r.AverageRating.ToString("0.0")</span>
+                                <div>
+                                    <div class="star-rating">@for (int i = 1; i <= 5; i++) { <i class="bi @(i <= stars ? "bi-star-fill" : "bi-star")"></i> }</div>
+                                    <small class="text-muted">@r.Reviews.Count total reviews</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <button class="btn btn-primary-flavorly rounded-pill px-4" data-bs-toggle="collapse" data-bs-target="#reviewForm">Write a Review</button>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-outline-flavorly rounded-pill px-4">Sign In to Review</a>
+                    }
+                </div>
+
+                <div class="collapse mb-4" id="reviewForm">
+                    <div class="sidebar-card">
+                        <h6 class="fw-bold mb-3">Your Review</h6>
+                        <form asp-controller="Recipe" asp-action="AddReview" asp-route-id="@r.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="small fw-semibold mb-2 d-block">Rating</label>
+                                @for (int i = 1; i <= 5; i++) {
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="rating" value="@i" id="r@(i)" @(i==5?"checked":"") />
+                                        <label class="form-check-label" for="r@(i)">@i <i class="bi bi-star-fill text-warning"></i></label>
+                                    </div>
+                                }
+                            </div>
+                            <div class="mb-3"><textarea name="comment" class="form-control" rows="3" placeholder="Share your experience…"></textarea></div>
+                            <button type="submit" class="btn btn-primary-flavorly rounded-pill px-4">Submit Review</button>
+                        </form>
+                    </div>
+                </div>
+
+                @if (!r.Reviews.Any())
+                {
+                    <div class="text-center py-4 text-muted"><i class="bi bi-chat-square-heart fs-2 mb-2 d-block"></i>No reviews yet. Be the first!</div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var rev in r.Reviews.OrderByDescending(rv => rv.CreatedAt))
+                        {
+                            <div class="review-card">
+                                <div class="d-flex gap-3">
+                                    <img src="@(rev.Author?.AvatarUrl ?? "/images/default-avatar.png")" class="rounded-circle" width="44" height="44" style="object-fit:cover;flex-shrink:0" onerror="this.src='https://ui-avatars.com/api/?name=U&background=E8E2DA&size=44'" alt="reviewer"/>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <span class="fw-semibold">@(rev.Author?.DisplayName ?? "Anonymous")</span>
+                                            <div class="star-rating">@for(int i=1;i<=5;i++){<i class="bi @(i<=rev.Rating?"bi-star-fill":"bi-star")"></i>}</div>
+                                        </div>
+                                        <small class="text-muted">@rev.CreatedAt.ToString("MMM d, yyyy")</small>
+                                        <p class="mb-2 mt-1 small">@rev.Comment</p>
+                                        <button class="btn btn-sm btn-light rounded-pill" style="font-size:.75rem;"><i class="bi bi-hand-thumbs-up me-1"></i>Helpful (@rev.HelpfulCount)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div style="position:sticky;top:90px;">
+                <div class="sidebar-card mb-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="@(r.Author?.AvatarUrl ?? "/images/default-avatar.png")" class="rounded-circle" width="60" height="60" style="object-fit:cover" onerror="this.src='https://ui-avatars.com/api/?name=Chef&background=C8622A&color=fff&size=60'" alt="author"/>
+                        <div><div class="fw-bold">@(r.Author?.DisplayName ?? "Chef")</div><div class="text-muted small">Culinary Expert</div></div>
+                    </div>
+                    @if (r.Author != null)
+                    {
+                        <a asp-controller="Profile" asp-action="Index" asp-route-username="@r.Author.UserName" class="btn btn-outline-flavorly w-100 rounded-pill">Follow Author</a>
+                    }
+                </div>
+
+                @if (r.CaloriesPerServing > 0)
+                {
+                    <div class="nutrition-card mb-4">
+                        <h6 class="text-white fw-bold mb-3">Nutrition <small class="text-muted fw-normal">(per serving)</small></h6>
+                        <div class="nutrition-row"><span class="nutrition-label">Calories</span><span class="nutrition-val">@r.CaloriesPerServing kcal</span></div>
+                        <div class="nutrition-row"><span class="nutrition-label">Protein</span><span class="nutrition-val">@r.Protein g</span></div>
+                        <div class="nutrition-row"><span class="nutrition-label">Fat</span><span class="nutrition-val">@r.Fat g</span></div>
+                        <div class="nutrition-row"><span class="nutrition-label">Carbs</span><span class="nutrition-val">@r.Carbs g</span></div>
+                    </div>
+                }
+
+                @if (Model.RelatedRecipes.Any())
+                {
+                    <div class="sidebar-card">
+                        <h6 class="fw-bold mb-3">You might also like</h6>
+                        @foreach (var rel in Model.RelatedRecipes)
+                        {
+                            <a asp-controller="Recipe" asp-action="Detail" asp-route-id="@rel.Id" class="text-decoration-none text-dark">
+                                <div class="d-flex gap-3 mb-3 hover-lift">
+                                    <img src="@rel.HeroImageUrl" class="rounded-2" style="width:80px;height:60px;object-fit:cover;flex-shrink:0;" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=80'" alt="@rel.Title"/>
+                                    <div><div class="fw-semibold small">@rel.Title</div><div class="text-muted" style="font-size:.75rem;"><i class="bi bi-clock me-1"></i>@(rel.PrepTime+rel.CookTime) min</div></div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+@using Microsoft.AspNetCore.Identity
+@using FINALPROJECT.Models
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    var currentUser = await UserManager.GetUserAsync(User);
+    <div class="d-flex align-items-center gap-2">
+        <a asp-controller="Profile" asp-action="Index" asp-route-username="@currentUser!.UserName" class="d-flex align-items-center gap-2 text-decoration-none">
+            <img src="@currentUser!.AvatarUrl" class="rounded-circle" width="34" height="34" style="object-fit:cover;" alt="avatar" onerror="this.src='/images/default-avatar.png'" />
+            <span class="nav-username d-none d-lg-inline">@currentUser.DisplayName</span>
+        </a>
+        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Sign Out</button>
+        </form>
+    </div>
+}
+else
+{
+    <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-ghost-nav rounded-pill px-3">Sign In</a>
+    <a asp-controller="Recipe" asp-action="Create" asp-route-returnUrl="@Context.Request.Path" class="btn btn-sm btn-primary-flavorly rounded-pill px-3">
+        <i class="bi bi-plus-lg me-1"></i>Share Recipe
+    </a>
+}

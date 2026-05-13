@@ -1,50 +1,107 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - FINALPROJECT</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@(ViewData["Title"] != null ? ViewData["Title"] + " — Flavorly" : "Flavorly — Cook More, Stress Less")</title>
+    <meta name="description" content="@(ViewData["Description"] ?? "Flavorly is a vibrant cooking community where you can discover recipes, watch tutorials, and share your culinary creations.")" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/FINALPROJECT.styles.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FINALPROJECT</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+<body class="@(ViewData["BodyClass"] ?? "")">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg flavorly-nav sticky-top @(ViewData["NavClass"] ?? "nav-light")">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
+                <span class="brand-dot"></span>
+                <span class="brand-text">Flavorly</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Recipe" asp-action="Feed">Recipes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Video" asp-action="Feed">Videos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Tip" asp-action="Index">Tips</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Collection" asp-action="Index">Collections</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <form class="nav-search d-none d-lg-flex" asp-controller="Home" asp-action="Search" method="get">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search recipes…" />
+                        </div>
+                    </form>
+                    @await Html.PartialAsync("_LoginPartial")
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="flavorly-footer">
+        <div class="container">
+            <div class="row gy-4 py-5">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="brand-dot"></span>
+                        <span class="brand-text text-white fs-5 fw-bold">Flavorly</span>
+                    </div>
+                    <p class="text-muted-light">Cook more, stress less, share all. A community for passionate home cooks and professional chefs alike.</p>
+                </div>
+                <div class="col-6 col-lg-2 offset-lg-2">
+                    <h6 class="text-white fw-semibold mb-3">Explore</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a asp-controller="Recipe" asp-action="Feed">Recipes</a></li>
+                        <li><a asp-controller="Video" asp-action="Feed">Videos</a></li>
+                        <li><a asp-controller="Tip" asp-action="Index">Tips</a></li>
+                        <li><a asp-controller="Collection" asp-action="Index">Collections</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-semibold mb-3">Account</h6>
+                    <ul class="list-unstyled footer-links">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li><a asp-controller="Profile" asp-action="Index" asp-route-username="@User.Identity.Name">My Profile</a></li>
+                            <li><a asp-controller="Recipe" asp-action="Create">Share Recipe</a></li>
+                        }
+                        else
+                        {
+                            <li><a asp-controller="Account" asp-action="Login">Sign In</a></li>
+                            <li><a asp-controller="Account" asp-action="Register">Create Account</a></li>
+                        }
                     </ul>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - FINALPROJECT - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <hr class="border-secondary" />
+            <div class="py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <small class="text-muted-light">© @DateTime.Now.Year Flavorly. All rights reserved.</small>
+                <small class="text-muted-light">Made with <i class="bi bi-heart-fill text-primary-color"></i> for food lovers</small>
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

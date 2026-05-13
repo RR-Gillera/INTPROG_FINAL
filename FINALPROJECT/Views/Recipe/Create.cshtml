@@ -1,0 +1,228 @@
+@model FINALPROJECT.ViewModels.CreateRecipeViewModel
+@using FINALPROJECT.Models
+@{
+    ViewData["Title"] = "Create New Post";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Create New Post</h1>
+        <p class="text-muted">Share your culinary masterpieces, quick tips, or favorite kitchen stories with the Flavorly community.</p>
+    </div>
+
+    <!-- Post Type Tabs -->
+    <div class="d-flex justify-content-center gap-2 mb-4">
+        <button type="button" class="tab-pill active"><i class="bi bi-journal-text me-1"></i>Recipe</button>
+        <button type="button" class="tab-pill"><i class="bi bi-image me-1"></i>Photo</button>
+        <button type="button" class="tab-pill"><i class="bi bi-play-circle me-1"></i>Video</button>
+        <button type="button" class="tab-pill"><i class="bi bi-lightbulb me-1"></i>Tip</button>
+    </div>
+
+    <form asp-controller="Recipe" asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
+        @Html.AntiForgeryToken()
+        <div class="create-form-card">
+            <!-- Title -->
+            <div class="mb-4">
+                <label class="filter-label">POST TITLE</label>
+                <input asp-for="Title" class="form-control form-control-lg border-0 border-bottom rounded-0 px-0 fw-semibold"
+                       placeholder="Give your recipe a name…" style="font-size:1.4rem;background:transparent;" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <label class="filter-label">SHORT DESCRIPTION</label>
+                <textarea asp-for="Description" class="form-control border-0 border-bottom rounded-0 px-0" rows="2"
+                          placeholder="Tell the story behind this dish…" style="background:transparent;resize:none;"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+
+            <!-- Hero Image -->
+            <div class="mb-4">
+                <label class="filter-label">HERO IMAGE</label>
+                <div class="drop-zone" id="dropZone" onclick="document.getElementById('heroImageInput').click()">
+                    <i class="bi bi-cloud-upload fs-2 text-primary-color mb-2 d-block"></i>
+                    <p class="mb-1 fw-semibold">Drop your best food photo here</p>
+                    <p class="text-muted small mb-0">High resolution JPG or PNG preferred</p>
+                    <img id="imgPreview" src="" alt="" class="mt-3 rounded-3 d-none" style="max-height:200px;object-fit:cover;" />
+                </div>
+                <input type="file" id="heroImageInput" asp-for="HeroImage" accept="image/*" class="d-none"
+                       onchange="previewImage(this)" />
+            </div>
+
+            <!-- Time / Servings / Difficulty -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="filter-label"><i class="bi bi-clock me-1"></i>PREP TIME (min)</label>
+                    <input asp-for="PrepTime" type="number" class="form-control" placeholder="e.g. 45" />
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label"><i class="bi bi-people me-1"></i>SERVINGS</label>
+                    <input asp-for="Servings" type="number" class="form-control" placeholder="e.g. 4" />
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label"><i class="bi bi-bar-chart me-1"></i>DIFFICULTY</label>
+                    <select asp-for="Difficulty" class="form-select">
+                        <option value="@Difficulty.Easy">Beginner</option>
+                        <option value="@Difficulty.Medium">Intermediate</option>
+                        <option value="@Difficulty.Advanced">Advanced</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label">COOK TIME (min)</label>
+                    <input asp-for="CookTime" type="number" class="form-control" placeholder="e.g. 30" />
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label">CATEGORY</label>
+                    <select asp-for="Category" class="form-select">
+                        <option value="@RecipeCategory.BreakfastBrunch">Breakfast & Brunch</option>
+                        <option value="@RecipeCategory.MainDishes">Main Dishes</option>
+                        <option value="@RecipeCategory.Desserts">Desserts</option>
+                        <option value="@RecipeCategory.SnacksApps">Snacks & Apps</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label">CALORIES (per serving)</label>
+                    <input asp-for="CaloriesPerServing" type="number" class="form-control" placeholder="e.g. 350" />
+                </div>
+            </div>
+
+            <!-- Dietary -->
+            <div class="mb-4 d-flex gap-4">
+                <div class="form-check"><input class="form-check-input" type="checkbox" asp-for="IsVegetarian" id="chkVeg" /><label class="form-check-label small" for="chkVeg">Vegetarian</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" asp-for="IsVegan" id="chkVegan" /><label class="form-check-label small" for="chkVegan">Vegan</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" asp-for="IsGlutenFree" id="chkGF" /><label class="form-check-label small" for="chkGF">Gluten-Free</label></div>
+            </div>
+        </div>
+
+        <!-- Ingredients -->
+        <div class="create-form-card">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h4 class="mb-0 fw-bold">Ingredients</h4>
+                <button type="button" class="btn btn-sm btn-outline-flavorly rounded-pill" onclick="addIngredient()">
+                    <i class="bi bi-plus me-1"></i>Add Ingredient
+                </button>
+            </div>
+            <div id="ingredientList">
+                @for (int i = 0; i < Model.Ingredients.Count; i++)
+                {
+                    <div class="ingredient-row" id="ingRow_@i">
+                        <span class="text-muted fw-bold" style="width:24px;font-size:.85rem;">@(i+1)</span>
+                        <input type="text" name="Ingredients[@i]" class="form-control form-control-sm border-0"
+                               placeholder="e.g. 2 cups of organic flour" value="@Model.Ingredients[i]" />
+                        <button type="button" class="btn btn-sm text-muted" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>
+                    </div>
+                }
+            </div>
+            <span class="text-danger small" id="ingError">@(ViewData.ModelState["Ingredients"]?.Errors.FirstOrDefault()?.ErrorMessage)</span>
+        </div>
+
+        <!-- Steps -->
+        <div class="create-form-card">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h4 class="mb-0 fw-bold">Preparation Steps</h4>
+                <button type="button" class="btn btn-sm btn-outline-flavorly rounded-pill" onclick="addStep()">
+                    <i class="bi bi-plus me-1"></i>Add Step
+                </button>
+            </div>
+            <div id="stepList">
+                @for (int i = 0; i < Model.Steps.Count; i++)
+                {
+                    <div class="step-row" id="stepRow_@i">
+                        <i class="bi bi-grip-vertical text-muted mt-2" style="cursor:grab;"></i>
+                        <div class="flex-grow-1">
+                            <label class="filter-label">STEP @(i+1)</label>
+                            <input type="text" name="Steps[@i].Title" class="form-control form-control-sm mb-2"
+                                   placeholder="Step title…" value="@Model.Steps[i].Title" />
+                            <textarea name="Steps[@i].Description" class="form-control form-control-sm" rows="2"
+                                      placeholder="Describe this step…">@Model.Steps[i].Description</textarea>
+                        </div>
+                        <button type="button" class="btn btn-sm text-muted mt-2" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Process Photos -->
+        <div class="create-form-card">
+            <h4 class="fw-bold mb-3">Process Photos &amp; Video</h4>
+            <div class="d-flex gap-3 flex-wrap">
+                <div class="drop-zone" style="width:120px;height:120px;padding:1rem;" onclick="document.getElementById('processFiles').click()">
+                    <i class="bi bi-plus fs-4 text-muted"></i>
+                </div>
+                <input type="file" id="processFiles" multiple accept="image/*,video/*" class="d-none" />
+                <p class="text-muted small align-self-center">Upload process photos and video clips to show your cooking journey.</p>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="d-flex align-items-center justify-content-between py-3 px-2" style="border-top:1px solid var(--border);background:var(--bg-light);position:sticky;bottom:0;z-index:100;">
+            <small class="text-muted"><i class="bi bi-circle-fill text-primary-color me-1" style="font-size:.5rem;"></i>Autosaved 2 mins ago</small>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4">Save as Draft</button>
+                <button type="button" class="btn btn-outline-flavorly rounded-pill px-4">Preview Post</button>
+                <button type="submit" class="btn btn-primary-flavorly rounded-pill px-4 fw-semibold">
+                    Publish to Community
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+let ingCount = @Model.Ingredients.Count;
+let stepCount = @Model.Steps.Count;
+
+function addIngredient() {
+    const list = document.getElementById('ingredientList');
+    const div = document.createElement('div');
+    div.className = 'ingredient-row';
+    div.innerHTML = `<span class="text-muted fw-bold" style="width:24px;font-size:.85rem;">${list.children.length+1}</span>
+        <input type="text" name="Ingredients[${ingCount}]" class="form-control form-control-sm border-0" placeholder="e.g. 1 cup of ingredient…" />
+        <button type="button" class="btn btn-sm text-muted" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>`;
+    list.appendChild(div);
+    ingCount++;
+}
+
+function addStep() {
+    const list = document.getElementById('stepList');
+    const idx = stepCount;
+    const div = document.createElement('div');
+    div.className = 'step-row';
+    div.innerHTML = `<i class="bi bi-grip-vertical text-muted mt-2" style="cursor:grab;"></i>
+        <div class="flex-grow-1">
+            <label class="filter-label">STEP ${list.children.length+1}</label>
+            <input type="text" name="Steps[${idx}].Title" class="form-control form-control-sm mb-2" placeholder="Step title…" />
+            <textarea name="Steps[${idx}].Description" class="form-control form-control-sm" rows="2" placeholder="Describe this step…"></textarea>
+        </div>
+        <button type="button" class="btn btn-sm text-muted mt-2" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>`;
+    list.appendChild(div);
+    stepCount++;
+}
+
+function removeRow(btn) {
+    btn.closest('[class$="-row"]').remove();
+}
+
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = document.getElementById('imgPreview');
+            img.src = e.target.result;
+            img.classList.remove('d-none');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+const dropZone = document.getElementById('dropZone');
+['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag-over'); }));
+['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag-over'); }));
+dropZone.addEventListener('drop', ev => {
+    const files = ev.dataTransfer.files;
+    if (files.length) { document.getElementById('heroImageInput').files = files; previewImage(document.getElementById('heroImageInput')); }
+});
+</script>
+}

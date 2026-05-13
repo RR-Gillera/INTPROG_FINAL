@@ -1,0 +1,110 @@
+@model FINALPROJECT.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Create Account";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account — Flavorly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body style="margin:0;padding:0;">
+<div class="row g-0" style="min-height:100vh;">
+    <!-- Left Dark Panel -->
+    <div class="col-lg-5 d-none d-lg-flex" style="background-image:url('https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=800&q=80');background-size:cover;background-position:center;position:relative;">
+        <div style="position:absolute;inset:0;background:rgba(28,22,18,.82);"></div>
+        <div style="position:relative;z-index:1;display:flex;flex-direction:column;justify-content:space-between;padding:3rem;width:100%;">
+            <div class="d-flex align-items-center gap-2">
+                <span class="brand-dot"></span>
+                <span style="font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:#fff;">Flavorly</span>
+            </div>
+            <div>
+                <div style="color:var(--primary);font-size:2.5rem;font-family:'Playfair Display',serif;line-height:1;">"</div>
+                <blockquote style="font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff;line-height:1.4;margin:0.5rem 0 1.5rem;">
+                    "People who love to eat are always the best people."
+                </blockquote>
+                <div style="color:#9a8f88;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;">— Julia Child</div>
+            </div>
+            <div class="d-flex gap-4">
+                <a href="#" style="color:#6B5E55;font-size:.85rem;text-decoration:none;">Curated Recipes</a>
+                <a href="#" style="color:#6B5E55;font-size:.85rem;text-decoration:none;">Global Community</a>
+                <a href="#" style="color:#6B5E55;font-size:.85rem;text-decoration:none;">Chef Masterclasses</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right White Panel -->
+    <div class="col-lg-7 auth-right">
+        <div style="max-width:440px;width:100%;margin:0 auto;">
+            <h2 class="fw-bold mb-1" style="font-family:'Playfair Display',serif;">Create Account</h2>
+            <p class="text-muted mb-4">Join thousands of passionate home cooks</p>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger rounded-3 small py-2">
+                    @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    { <div>@err.ErrorMessage</div> }
+                </div>
+            }
+
+            <form asp-controller="Account" asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-uppercase" style="letter-spacing:.06em;">Display Name</label>
+                    <div class="auth-input-icon">
+                        <i class="bi bi-person"></i>
+                        <input asp-for="DisplayName" class="form-control py-3" placeholder="Your name" />
+                    </div>
+                    <span asp-validation-for="DisplayName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-uppercase" style="letter-spacing:.06em;">Email Address</label>
+                    <div class="auth-input-icon">
+                        <i class="bi bi-envelope"></i>
+                        <input asp-for="Email" type="email" class="form-control py-3" placeholder="chef@flavorly.com" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-uppercase" style="letter-spacing:.06em;">Password</label>
+                    <div class="auth-input-icon">
+                        <i class="bi bi-lock"></i>
+                        <input asp-for="Password" type="password" class="form-control py-3" placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold text-uppercase" style="letter-spacing:.06em;">Confirm Password</label>
+                    <div class="auth-input-icon">
+                        <i class="bi bi-lock-fill"></i>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control py-3" placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary-flavorly w-100 rounded-pill py-3 fw-semibold mb-4" style="font-size:1rem;">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="text-center text-muted mb-0" style="font-size:.9rem;">
+                Already have an account?
+                <a asp-controller="Account" asp-action="Login" class="text-primary-color fw-semibold text-decoration-none">Sign In</a>
+            </p>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

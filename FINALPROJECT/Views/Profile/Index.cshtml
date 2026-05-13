@@ -1,0 +1,258 @@
+@model FINALPROJECT.ViewModels.UserProfileViewModel
+@{
+    ViewData["Title"] = Model.ProfileUser.DisplayName;
+    var u = Model.ProfileUser;
+}
+
+<!-- Cover -->
+<div style="position:relative;">
+    <img src="@u.CoverImageUrl" class="profile-cover w-100"
+         onerror="this.src='https://images.unsplash.com/photo-1495195134817-aeb325a55b65?w=1200&q=80'" alt="cover" />
+    <div class="container" style="position:relative;">
+        <div class="d-flex align-items-end justify-content-between flex-wrap gap-3 pb-3"
+             style="margin-top:-60px;">
+            <div class="d-flex align-items-end gap-4">
+                <img src="@u.AvatarUrl" class="profile-avatar"
+                     onerror="this.src='https://ui-avatars.com/api/?name=@Uri.EscapeDataString(u.DisplayName)&background=C8622A&color=fff&size=120'" alt="avatar"/>
+                <div class="pb-2">
+                    <h2 class="fw-bold mb-0">@u.DisplayName</h2>
+                    <div class="text-muted small">
+                        <span>@@@u.UserName</span>
+                        @if (!string.IsNullOrEmpty(u.Location))
+                        { <span class="ms-2"><i class="bi bi-geo-alt me-1"></i>@u.Location</span> }
+                    </div>
+                </div>
+            </div>
+            @if (!Model.IsOwnProfile && User.Identity?.IsAuthenticated == true)
+            {
+                <div class="d-flex gap-2 pb-2">
+                    <form asp-controller="Profile" asp-action="Follow" asp-route-username="@u.UserName" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn @(Model.IsFollowing ? "btn-outline-flavorly" : "btn-primary-flavorly") rounded-pill px-4 fw-semibold">
+                            @(Model.IsFollowing ? "Following" : "Follow")
+                        </button>
+                    </form>
+                    <button class="btn btn-outline-secondary rounded-circle" style="width:42px;height:42px;">
+                        <i class="bi bi-share"></i>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row g-4">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div class="sidebar-card mb-3">
+                <div class="section-eyebrow mb-2">ABOUT @u.DisplayName.ToUpper()</div>
+                <p class="text-muted small mb-3">@(string.IsNullOrEmpty(u.Bio) ? "No bio yet." : u.Bio)</p>
+                <div class="d-flex justify-content-between text-center border-top pt-3">
+                    <div><div class="fw-bold">@Model.FollowersCount.ToString("N0")</div><div class="text-muted" style="font-size:.72rem;">FOLLOWERS</div></div>
+                    <div><div class="fw-bold">@Model.FollowingCount.ToString("N0")</div><div class="text-muted" style="font-size:.72rem;">FOLLOWING</div></div>
+                    <div><div class="fw-bold">@Model.Recipes.Count()</div><div class="text-muted" style="font-size:.72rem;">RECIPES</div></div>
+                </div>
+            </div>
+
+            <div class="sidebar-card mb-3">
+                <div class="section-eyebrow mb-3">ACHIEVEMENTS</div>
+                <div class="d-flex flex-column gap-2">
+                    <div class="achievement-badge">
+                        <div class="achievement-icon" style="background:#FFF0E5;">🏆</div>
+                        <div><div class="fw-semibold" style="font-size:.82rem;">Top Contributor</div><div class="text-muted" style="font-size:.72rem;">Awarded 2024</div></div>
+                    </div>
+                    <div class="achievement-badge">
+                        <div class="achievement-icon" style="background:#EAF5EE;">🌿</div>
+                        <div><div class="fw-semibold" style="font-size:.82rem;">Sustainable Chef</div><div class="text-muted" style="font-size:.72rem;">Awarded 2024</div></div>
+                    </div>
+                    <div class="achievement-badge">
+                        <div class="achievement-icon" style="background:#EEF2FF;">🎥</div>
+                        <div><div class="fw-semibold" style="font-size:.82rem;">Video Maven</div><div class="text-muted" style="font-size:.72rem;">Awarded 2024</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <div class="section-eyebrow mb-3">CONNECT</div>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-muted fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-muted fs-5"><i class="bi bi-pinterest"></i></a>
+                    <a href="#" class="text-muted fs-5"><i class="bi bi-tiktok"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="col-lg-9">
+            <!-- Tab Nav -->
+            <ul class="nav nav-tabs border-bottom mb-4" style="border-color:var(--border);">
+                @foreach (var tab in new[] { "Recipes", "Videos", "Tips", "Collections" })
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Profile" asp-action="Index"
+                           asp-route-username="@u.UserName" asp-route-tab="@tab"
+                           class="nav-link @(Model.ActiveTab == tab ? "active text-primary-color fw-semibold border-primary-color" : "text-muted")"
+                           style="@(Model.ActiveTab == tab ? "border-bottom:2px solid var(--primary);" : "")">
+                            @tab
+                            @if (tab == "Recipes")
+                            { <span class="badge rounded-pill bg-light text-muted ms-1" style="font-size:.7rem;">@Model.Recipes.Count()</span> }
+                        </a>
+                    </li>
+                }
+            </ul>
+
+            <!-- Recipes Tab -->
+            @if (Model.ActiveTab == "Recipes")
+            {
+                if (!Model.Recipes.Any())
+                {
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="bi bi-person-bounding-box"></i></div>
+                        <div class="section-eyebrow mb-2">YOUR CULINARY JOURNAL</div>
+                        <h3>You haven't shared any recipes yet.</h3>
+                        <p class="text-muted">Your profile is a blank canvas. Start your culinary legacy by sharing your first masterpiece.</p>
+                        <a asp-controller="Recipe" asp-action="Create" class="btn btn-primary-flavorly rounded-pill px-4 mt-2">
+                            <i class="bi bi-plus me-1"></i>Share your first recipe
+                        </a>
+                        <div class="d-flex justify-content-center gap-4 mt-4 text-muted small">
+                            <span><i class="bi bi-image me-1"></i>Add Photos</span>
+                            <span><i class="bi bi-list-ul me-1"></i>List Ingredients</span>
+                            <span><i class="bi bi-clock me-1"></i>Set Timing</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        @foreach (var recipe in Model.Recipes)
+                        {
+                            <div class="col-md-6 col-xl-4">
+                                <div class="recipe-card">
+                                    <div class="recipe-card-img-wrap">
+                                        <img src="@recipe.HeroImageUrl" alt="@recipe.Title"
+                                             onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80'" />
+                                        <span class="card-tag-badge @(recipe.Difficulty == FINALPROJECT.Models.Difficulty.Easy ? "card-tag-healthy" : recipe.Difficulty == FINALPROJECT.Models.Difficulty.Advanced ? "card-tag-trending" : "card-tag-vegan")">
+                                            @recipe.Difficulty
+                                        </span>
+                                        <span class="card-time-badge"><i class="bi bi-clock me-1"></i>@(recipe.PrepTime + recipe.CookTime) min</span>
+                                        <button class="card-bookmark"><i class="bi bi-bookmark"></i></button>
+                                    </div>
+                                    <div class="recipe-card-body">
+                                        <a asp-controller="Recipe" asp-action="Detail" asp-route-id="@recipe.Id" class="text-decoration-none text-dark">
+                                            <h6 class="fw-semibold mb-1">@recipe.Title</h6>
+                                        </a>
+                                        <div class="d-flex align-items-center gap-2 mt-1 text-muted small">
+                                            <i class="bi bi-clock"></i><span>@(recipe.PrepTime + recipe.CookTime) min</span>
+                                            @if (recipe.CaloriesPerServing > 0)
+                                            { <i class="bi bi-fire ms-2"></i><span>@recipe.CaloriesPerServing cal</span> }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <!-- Create New Card -->
+                        <div class="col-md-6 col-xl-4">
+                            <a asp-controller="Recipe" asp-action="Create" class="create-recipe-card">
+                                <i class="bi bi-plus-circle fs-2 mb-2"></i>
+                                <div class="fw-semibold">Create New Recipe</div>
+                                <small>Share your debut</small>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="text-center mt-5">
+                        <a asp-controller="Recipe" asp-action="Feed" asp-route-authorId="@u.Id"
+                           class="btn btn-outline-secondary rounded-pill px-4">View All Recipes</a>
+                    </div>
+                }
+            }
+
+            <!-- Videos Tab -->
+            @if (Model.ActiveTab == "Videos")
+            {
+                if (!Model.Videos.Any())
+                {
+                    <div class="empty-state"><div class="empty-state-icon"><i class="bi bi-camera-video"></i></div><h4>No videos yet</h4></div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        @foreach (var v in Model.Videos)
+                        {
+                            <div class="col-md-6 col-lg-4">
+                                <div class="recipe-card">
+                                    <div class="recipe-card-img-wrap">
+                                        <img src="@v.ThumbnailUrl" alt="@v.Title" onerror="this.src='https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400'" />
+                                        <span class="card-time-badge">@v.Duration</span>
+                                    </div>
+                                    <div class="recipe-card-body">
+                                        <a asp-controller="Video" asp-action="Player" asp-route-id="@v.Id" class="text-decoration-none text-dark">
+                                            <h6 class="fw-semibold mb-0">@v.Title</h6>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+
+            <!-- Tips Tab -->
+            @if (Model.ActiveTab == "Tips")
+            {
+                if (!Model.Tips.Any())
+                {
+                    <div class="empty-state"><div class="empty-state-icon"><i class="bi bi-lightbulb"></i></div><h4>No tips yet</h4></div>
+                }
+                else
+                {
+                    <div class="row g-3">
+                        @foreach (var tip in Model.Tips)
+                        {
+                            <div class="col-12">
+                                <div class="sidebar-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="fw-bold mb-1">@tip.Title</h6>
+                                            <p class="text-muted small mb-0">@tip.Content</p>
+                                        </div>
+                                        <span class="badge bg-light text-muted ms-3 text-nowrap">
+                                            <i class="bi bi-heart-fill text-danger me-1"></i>@tip.LikeCount
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+
+            <!-- Collections Tab -->
+            @if (Model.ActiveTab == "Collections")
+            {
+                if (!Model.Collections.Any())
+                {
+                    <div class="empty-state"><div class="empty-state-icon"><i class="bi bi-collection"></i></div><h4>No collections yet</h4></div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        @foreach (var col in Model.Collections)
+                        {
+                            <div class="col-md-6 col-lg-4">
+                                <div class="collection-card">
+                                    <img src="@col.CoverImageUrl" alt="@col.Name" style="width:100%;height:160px;object-fit:cover;"
+                                         onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'" />
+                                    <div class="p-3">
+                                        <h6 class="fw-bold mb-1">@col.Name</h6>
+                                        <p class="text-muted small mb-0">@col.CollectionRecipes.Count recipes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

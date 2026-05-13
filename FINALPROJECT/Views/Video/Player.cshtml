@@ -1,0 +1,185 @@
+@model FINALPROJECT.ViewModels.VideoPlayerViewModel
+@{
+    ViewData["Title"] = Model.Video.Title;
+    ViewData["BodyClass"] = "dark-page";
+    ViewData["NavClass"] = "nav-dark";
+    var v = Model.Video;
+    var ingredients = v.Ingredients?.Split('\n', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+    var instructions = v.Instructions?.Split('\n', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="row g-4">
+        <!-- Left: Player -->
+        <div class="col-lg-8">
+            <div class="video-player-wrap mb-3">
+                @if (!string.IsNullOrWhiteSpace(v.VideoUrl))
+                {
+                    <video controls class="w-100 h-100">
+                        <source src="@v.VideoUrl" />
+                        Your browser does not support video playback.
+                    </video>
+                }
+                else
+                {
+                    <div class="video-player-placeholder" style="position:relative;">
+                        <img src="@v.ThumbnailUrl" alt="@v.Title" style="width:100%;height:100%;object-fit:cover;"
+                             onerror="this.src='https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80'" />
+                        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                            <div class="play-btn-circle" style="width:72px;height:72px;font-size:1.8rem;cursor:pointer;background:rgba(200,98,42,.9);">
+                                <i class="bi bi-play-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Badges + Likes -->
+            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="d-flex gap-2">
+                    <span class="badge rounded-pill" style="background:#2e2620;color:#9a8f88;font-size:.72rem;padding:.4rem .9rem;">MASTERCLASS</span>
+                    <span class="badge rounded-pill" style="background:#2e2620;color:#9a8f88;font-size:.72rem;padding:.4rem .9rem;">NEW RELEASE</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm rounded-pill" style="background:#2e2620;color:#ccc;border:1px solid #3a312a;">
+                        <i class="bi bi-heart-fill text-danger me-1"></i>1.2k
+                    </button>
+                    <button class="btn btn-sm rounded-pill" style="background:#2e2620;color:#ccc;border:1px solid #3a312a;">
+                        <i class="bi bi-share me-1"></i>Share
+                    </button>
+                </div>
+            </div>
+
+            <h2 class="text-white mb-3">@v.Title</h2>
+
+            <!-- Author -->
+            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-4" style="background:#251E18;border:1px solid #2e2620;">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="@(v.Author?.AvatarUrl ?? "/images/default-avatar.png")" class="rounded-circle" width="52" height="52"
+                         style="object-fit:cover;border:2px solid #3a312a;"
+                         onerror="this.src='https://ui-avatars.com/api/?name=Chef&background=C8622A&color=fff&size=52'" alt="author"/>
+                    <div>
+                        <div class="text-white fw-semibold">@(v.Author?.DisplayName ?? "Chef")</div>
+                        <div style="color:#9a8f88;font-size:.82rem;">45.2k Subscribers · Culinary Educator</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary-flavorly rounded-pill px-4">Subscribe</button>
+            </div>
+
+            <!-- About -->
+            <div class="mb-4">
+                <h6 class="text-white fw-bold mb-2">About this video</h6>
+                <p style="color:#9a8f88;font-size:.92rem;">@v.Description</p>
+                <div class="d-flex gap-4 mt-3" style="color:#6B5E55;font-size:.82rem;">
+                    <span><i class="bi bi-eye me-1"></i>@v.ViewCount.ToString("N0") views</span>
+                    <span><i class="bi bi-calendar me-1"></i>Posted @v.CreatedAt.ToString("MMM d, yyyy")</span>
+                    <span><i class="bi bi-clock me-1"></i>@v.Duration</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Sidebar Tabs -->
+        <div class="col-lg-4">
+            <div class="rounded-3 overflow-hidden" style="background:#251E18;border:1px solid #2e2620;">
+                <!-- Tabs -->
+                <div class="d-flex border-bottom" style="border-color:#2e2620 !important;">
+                    <button class="flex-fill py-3 border-0 fw-semibold tab-sidebar-btn active" data-target="recipeTab" style="background:transparent;color:#fff;border-bottom:2px solid var(--primary) !important;">Recipe</button>
+                    <button class="flex-fill py-3 border-0 fw-semibold tab-sidebar-btn" data-target="commentsTab" style="background:transparent;color:#6B5E55;">Comments</button>
+                    <button class="flex-fill py-3 border-0 fw-semibold tab-sidebar-btn" data-target="upnextTab" style="background:transparent;color:#6B5E55;">Up Next</button>
+                </div>
+
+                <!-- Recipe Tab -->
+                <div id="recipeTab" class="p-4">
+                    @if (ingredients.Any())
+                    {
+                        <div class="mb-4">
+                            <h6 class="text-white fw-bold mb-3"><i class="bi bi-list-ul me-2 text-primary-color"></i>Ingredients</h6>
+                            @foreach (var ing in ingredients)
+                            {
+                                <div class="d-flex align-items-center gap-3 p-3 rounded-2 mb-2" style="background:#1C1612;border:1px solid #2e2620;">
+                                    <input type="checkbox" class="form-check-input mt-0" style="accent-color:var(--primary);width:16px;height:16px;flex-shrink:0;" />
+                                    <span style="color:#d4c9bf;font-size:.88rem;">@ing</span>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (instructions.Any())
+                    {
+                        <div class="mb-4">
+                            <h6 class="text-white fw-bold mb-3"><i class="bi bi-list-ol me-2 text-primary-color"></i>Instructions</h6>
+                            @for (int i = 0; i < instructions.Length; i++)
+                            {
+                                <div class="d-flex gap-3 mb-3">
+                                    <span class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white flex-shrink-0"
+                                          style="width:26px;height:26px;background:var(--primary);font-size:.75rem;">@(i+1)</span>
+                                    <p style="color:#9a8f88;font-size:.85rem;margin-bottom:0;">@instructions[i]</p>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <button class="btn w-100 rounded-pill fw-semibold" style="background:var(--green);color:#fff;padding:.75rem;">
+                        <i class="bi bi-download me-2"></i>Download Recipe PDF
+                    </button>
+                </div>
+
+                <!-- Comments Tab (hidden) -->
+                <div id="commentsTab" class="p-4 d-none">
+                    <div class="text-center py-4" style="color:#6B5E55;">
+                        <i class="bi bi-chat-square fs-2 mb-2 d-block"></i>
+                        <p class="mb-0">Comments coming soon</p>
+                    </div>
+                </div>
+
+                <!-- Up Next Tab (hidden) -->
+                <div id="upnextTab" class="p-4 d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-white fw-bold mb-0">UP NEXT</h6>
+                        <span style="color:#9a8f88;font-size:.78rem;">Auto-play On</span>
+                    </div>
+                    @if (Model.NextVideo != null)
+                    {
+                        var nv = Model.NextVideo;
+                        <a asp-controller="Video" asp-action="Player" asp-route-id="@nv.Id" class="text-decoration-none">
+                            <div class="d-flex gap-3 p-3 rounded-3" style="background:#1C1612;border:1px solid #2e2620;">
+                                <div style="position:relative;flex-shrink:0;width:100px;">
+                                    <img src="@nv.ThumbnailUrl" class="rounded-2" style="width:100px;height:65px;object-fit:cover;"
+                                         onerror="this.src='https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=100'" alt="@nv.Title"/>
+                                    <span class="duration-badge">@nv.Duration</span>
+                                </div>
+                                <div>
+                                    <div class="text-white fw-semibold small">@nv.Title</div>
+                                    <div style="color:#9a8f88;font-size:.75rem;">@nv.Category · @(nv.Author?.DisplayName ?? "Chef")</div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4" style="color:#6B5E55;">No more videos</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.querySelectorAll('.tab-sidebar-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-sidebar-btn').forEach(b => {
+            b.style.color = '#6B5E55';
+            b.style.borderBottom = 'none';
+        });
+        this.style.color = '#fff';
+        this.style.borderBottom = '2px solid var(--primary)';
+        ['recipeTab','commentsTab','upnextTab'].forEach(id => {
+            document.getElementById(id)?.classList.add('d-none');
+        });
+        document.getElementById(this.dataset.target)?.classList.remove('d-none');
+    });
+});
+</script>
+}
