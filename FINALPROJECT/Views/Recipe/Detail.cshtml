@@ -19,6 +19,13 @@
                 <button class="btn btn-sm btn-outline-light rounded-pill"><i class="bi bi-heart me-1"></i>Save</button>
                 <button class="btn btn-sm btn-outline-light rounded-pill"><i class="bi bi-share me-1"></i>Share</button>
                 <button class="btn btn-sm btn-outline-light rounded-pill" onclick="window.print()"><i class="bi bi-printer"></i></button>
+                @if (User.IsInRole("Admin"))
+                {
+                    <form asp-controller="Admin" asp-action="DeleteRecipe" asp-route-id="@r.Id" method="post" class="d-inline" onsubmit="return confirm('ADMIN: Delete this recipe?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-danger rounded-pill"><i class="bi bi-trash me-1"></i>Delete</button>
+                    </form>
+                }
             </div>
         </div>
     </div>

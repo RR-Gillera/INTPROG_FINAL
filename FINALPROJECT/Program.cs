@@ -13,10 +13,11 @@ builder.Services.AddDbContext<FlavorlyDbContext>(opts =>
 // 2. Identity
 builder.Services.AddIdentity<User, IdentityRole>(opts =>
 {
-    opts.Password.RequireDigit           = true;
-    opts.Password.RequiredLength         = 6;
+    opts.Password.RequireDigit           = false;
+    opts.Password.RequiredLength         = 4;
     opts.Password.RequireNonAlphanumeric = false;
     opts.Password.RequireUppercase       = false;
+    opts.Password.RequireLowercase       = false;
 })
 .AddEntityFrameworkStores<FlavorlyDbContext>()
 .AddDefaultTokenProviders();

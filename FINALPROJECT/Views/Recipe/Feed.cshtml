@@ -108,10 +108,10 @@
                     <span class="small text-muted">Sort by</span>
                     <select class="form-select form-select-sm rounded-pill" style="width:auto;"
                             onchange="this.form.submit()" name="sortBy" form="filterForm">
-                        <option value="newest"  @(Model.SortBy=="newest"  ? "selected":"")>Newest</option>
-                        <option value="rating"  @(Model.SortBy=="rating"  ? "selected":"")>Most Popular</option>
-                        <option value="time"    @(Model.SortBy=="time"    ? "selected":"")>Quickest</option>
-                        <option value="oldest"  @(Model.SortBy=="oldest"  ? "selected":"")>Oldest</option>
+                        <option value="newest"  selected="@(Model.SortBy=="newest")">Newest</option>
+                        <option value="rating"  selected="@(Model.SortBy=="rating")">Most Popular</option>
+                        <option value="time"    selected="@(Model.SortBy=="time")">Quickest</option>
+                        <option value="oldest"  selected="@(Model.SortBy=="oldest")">Oldest</option>
                     </select>
                 </div>
             </div>

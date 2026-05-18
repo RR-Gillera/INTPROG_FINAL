@@ -1,0 +1,90 @@
+@model IEnumerable<FINALPROJECT.Models.Recipe>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var recipeCount = ViewData["RecipeCount"];
+    var videoCount  = ViewData["VideoCount"];
+    var userCount   = ViewData["UserCount"];
+}
+
+<div class="container py-5">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="fw-bold mb-0">Admin Dashboard</h1>
+            <p class="text-muted">Manage the Flavorly community and content.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill">View Site</a>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="sidebar-card text-center py-4" style="background: #FDF8F3; border-color: var(--primary-light);">
+                <div class="stat-number text-primary-color fs-1">@recipeCount</div>
+                <div class="stat-label text-uppercase fw-bold text-muted" style="font-size: .75rem;">Total Recipes</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="sidebar-card text-center py-4">
+                <div class="stat-number fs-1">@videoCount</div>
+                <div class="stat-label text-uppercase fw-bold text-muted" style="font-size: .75rem;">Total Videos</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="sidebar-card text-center py-4">
+                <div class="stat-number fs-1">@userCount</div>
+                <div class="stat-label text-uppercase fw-bold text-muted" style="font-size: .75rem;">Community Members</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Management -->
+    <div class="sidebar-card p-0 overflow-hidden">
+        <div class="p-4 border-bottom d-flex align-items-center justify-content-between bg-light">
+            <h5 class="mb-0 fw-bold">Recent Recipes</h5>
+            <span class="badge bg-primary-flavorly rounded-pill">Latest 10</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Recipe</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Created</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@r.HeroImageUrl" class="rounded" width="48" height="40" style="object-fit:cover" />
+                                    <div class="fw-semibold">@r.Title</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="small">@(r.Author?.DisplayName ?? "Unknown")</div>
+                                <div class="text-muted" style="font-size: .7rem;">@r.Author?.Email</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border rounded-pill">@r.Category</span></td>
+                            <td class="small text-muted">@r.CreatedAt.ToString("MMM d, HH:mm")</td>
+                            <td class="text-end pe-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-controller="Recipe" asp-action="Detail" asp-route-id="@r.Id" class="btn btn-sm btn-light border rounded-pill px-3">View</a>
+                                    <form asp-action="DeleteRecipe" asp-route-id="@r.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this recipe?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

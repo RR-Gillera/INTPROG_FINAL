@@ -11,6 +11,10 @@
             <img src="@currentUser!.AvatarUrl" class="rounded-circle" width="34" height="34" style="object-fit:cover;" alt="avatar" onerror="this.src='/images/default-avatar.png'" />
             <span class="nav-username d-none d-lg-inline">@currentUser.DisplayName</span>
         </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-sm btn-dark rounded-pill px-3">Admin</a>
+        }
         <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
             @Html.AntiForgeryToken()
             <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Sign Out</button>
