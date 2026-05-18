@@ -17,6 +17,8 @@ namespace FINALPROJECT.Data
         public DbSet<CollectionRecipe> CollectionRecipes => Set<CollectionRecipe>();
         public DbSet<Review> Reviews => Set<Review>();
         public DbSet<Follow> Follows => Set<Follow>();
+        public DbSet<Report> Reports => Set<Report>();
+        public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -1,0 +1,95 @@
+@model FINALPROJECT.ViewModels.Admin.AdminRecipesViewModel
+@{
+    ViewData["Title"] = "Manage Recipes";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="admin-page-title mb-0">Manage Recipes</h1>
+        <p class="text-muted small">Review, moderate, and update the community's culinary creations.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Recipe" asp-action="Create" class="btn text-white rounded-pill px-3" style="background-color: var(--admin-primary); border-color: var(--admin-primary);">+ Create New Recipe</a>
+    </div>
+</div>
+
+<div class="stat-card mb-4 p-3 d-flex gap-3 align-items-center bg-light border-0">
+    <div class="input-group flex-grow-1" style="max-width: 400px;">
+        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search recipes by title, author or ingredients...">
+    </div>
+    <select class="form-select w-auto"><option>All Categories</option></select>
+    <select class="form-select w-auto"><option>All Statuses</option></select>
+    <select class="form-select w-auto"><option>Difficulty</option></select>
+    <button class="btn btn-dark ms-auto"><i class="bi bi-funnel-fill"></i></button>
+</div>
+
+<div class="stat-card p-0 overflow-hidden">
+    <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="selectAll">
+            <label class="form-check-label fw-bold small" for="selectAll">Select All (@Model.TotalCount.ToString("N0") recipes)</label>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-danger fw-semibold"><i class="bi bi-trash"></i> Bulk Delete</button>
+            <button class="btn btn-sm btn-outline-secondary fw-semibold">Archive Selected</button>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="text-muted small text-uppercase" style="font-size: 0.70rem;">
+                <tr>
+                    <th class="ps-3" style="width: 40px"></th>
+                    <th>Thumbnail</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Difficulty</th>
+                    <th>Date Posted</th>
+                    <th>Status</th>
+                    <th class="text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody style="font-size: 0.85rem;">
+                @foreach (var r in Model.Recipes)
+                {
+                    <tr>
+                        <td class="ps-3"><input class="form-check-input" type="checkbox"></td>
+                        <td><img src="@r.HeroImageUrl" class="rounded" width="48" height="40" style="object-fit:cover" /></td>
+                        <td class="fw-bold text-dark">@r.Title</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="/files/default-avatar.png" class="rounded-circle" width="20" height="20" />
+                                <span>@(r.Author?.DisplayName ?? "Unknown")</span>
+                            </div>
+                        </td>
+                        <td class="text-muted">@r.Category</td>
+                        <td><span class="badge @(r.Difficulty == FINALPROJECT.Models.Difficulty.Easy ? "text-success bg-success-subtle" : (r.Difficulty == FINALPROJECT.Models.Difficulty.Medium ? "text-primary bg-primary-subtle" : "text-danger bg-danger-subtle")) border border-opacity-25 rounded-pill">@r.Difficulty.ToString().ToUpper()</span></td>
+                        <td class="text-muted">@r.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">PUBLISHED</span></td> <!-- Mocked Status -->
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-link text-muted p-1"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-link text-muted p-1"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-sm btn-link text-muted p-1"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Mock -->
+    <div class="p-3 border-top d-flex justify-content-between align-items-center">
+        <div class="small text-muted">Showing <strong>1 - @(Math.Min(10, Model.TotalCount))</strong> of <strong>@Model.TotalCount.ToString("N0")</strong> recipes</div>
+        <div class="d-flex gap-1">
+            <button class="btn btn-sm btn-light border">&lt;</button>
+            <button class="btn btn-sm text-white border" style="background-color: var(--admin-primary);">1</button>
+            <button class="btn btn-sm btn-light border">2</button>
+            <button class="btn btn-sm btn-light border">3</button>
+            <span class="px-2 text-muted">...</span>
+            <button class="btn btn-sm btn-light border">&gt;</button>
+        </div>
+    </div>
+</div>

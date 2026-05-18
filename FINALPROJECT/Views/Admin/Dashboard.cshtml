@@ -1,90 +1,215 @@
-@model IEnumerable<FINALPROJECT.Models.Recipe>
+@model FINALPROJECT.ViewModels.Admin.AdminDashboardViewModel
 @{
-    ViewData["Title"] = "Admin Dashboard";
-    var recipeCount = ViewData["RecipeCount"];
-    var videoCount  = ViewData["VideoCount"];
-    var userCount   = ViewData["UserCount"];
+    ViewData["Title"] = "Dashboard Overview";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container py-5">
-    <div class="d-flex align-items-center justify-content-between mb-5">
-        <div>
-            <h1 class="fw-bold mb-0">Admin Dashboard</h1>
-            <p class="text-muted">Manage the Flavorly community and content.</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill">View Site</a>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="admin-page-title mb-0">Dashboard Overview</h1>
+        <p class="text-muted small">Welcome back, here's what's happening with Flavorly today.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Recipe" asp-action="Create" class="btn text-white rounded-pill px-3" style="background-color: var(--admin-primary); border-color: var(--admin-primary);">+ Add Recipe</a>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+                <div class="d-flex align-items-center justify-content-center rounded text-white" style="width: 40px; height: 40px; background-color: rgba(221, 110, 53, 0.1);">
+                    <i class="bi bi-egg-fried" style="color: var(--admin-primary);"></i>
+                </div>
+                <span class="badge bg-success-subtle text-success rounded-pill">+12% &uarr;</span>
+            </div>
+            <h2 class="fw-bold mb-0">@Model.TotalRecipes.ToString("N0")</h2>
+            <div class="text-muted small">Total Recipes</div>
         </div>
     </div>
-
-    <!-- Stats Overview -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
-            <div class="sidebar-card text-center py-4" style="background: #FDF8F3; border-color: var(--primary-light);">
-                <div class="stat-number text-primary-color fs-1">@recipeCount</div>
-                <div class="stat-label text-uppercase fw-bold text-muted" style="font-size: .75rem;">Total Recipes</div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+                <div class="d-flex align-items-center justify-content-center rounded" style="width: 40px; height: 40px; background-color: rgba(66, 133, 244, 0.1);">
+                    <i class="bi bi-people" style="color: #4285f4;"></i>
+                </div>
+                <span class="badge bg-success-subtle text-success rounded-pill">+8% &uarr;</span>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="sidebar-card text-center py-4">
-                <div class="stat-number fs-1">@videoCount</div>
-                <div class="stat-label text-uppercase fw-bold text-muted" style="font-size: .75rem;">Total Videos</div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="sidebar-card text-center py-4">
-                <div class="stat-number fs-1">@userCount</div>
-                <div class="stat-label text-uppercase fw-bold text-muted" style="font-size: .75rem;">Community Members</div>
-            </div>
+            <h2 class="fw-bold mb-0">@Model.TotalUsers.ToString("N0")</h2>
+            <div class="text-muted small">Total Users</div>
         </div>
     </div>
-
-    <!-- Content Management -->
-    <div class="sidebar-card p-0 overflow-hidden">
-        <div class="p-4 border-bottom d-flex align-items-center justify-content-between bg-light">
-            <h5 class="mb-0 fw-bold">Recent Recipes</h5>
-            <span class="badge bg-primary-flavorly rounded-pill">Latest 10</span>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+                <div class="d-flex align-items-center justify-content-center rounded" style="width: 40px; height: 40px; background-color: rgba(161, 66, 244, 0.1);">
+                    <i class="bi bi-play-btn" style="color: #a142f4;"></i>
+                </div>
+                <span class="badge bg-secondary-subtle text-secondary rounded-pill">Stable</span>
+            </div>
+            <h2 class="fw-bold mb-0">@Model.TotalVideos.ToString("N0")</h2>
+            <div class="text-muted small">Total Videos</div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="ps-4">Recipe</th>
-                        <th>Author</th>
-                        <th>Category</th>
-                        <th>Created</th>
-                        <th class="text-end pe-4">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var r in Model)
-                    {
-                        <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center gap-3">
-                                    <img src="@r.HeroImageUrl" class="rounded" width="48" height="40" style="object-fit:cover" />
-                                    <div class="fw-semibold">@r.Title</div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="small">@(r.Author?.DisplayName ?? "Unknown")</div>
-                                <div class="text-muted" style="font-size: .7rem;">@r.Author?.Email</div>
-                            </td>
-                            <td><span class="badge bg-light text-dark border rounded-pill">@r.Category</span></td>
-                            <td class="small text-muted">@r.CreatedAt.ToString("MMM d, HH:mm")</td>
-                            <td class="text-end pe-4">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a asp-controller="Recipe" asp-action="Detail" asp-route-id="@r.Id" class="btn btn-sm btn-light border rounded-pill px-3">View</a>
-                                    <form asp-action="DeleteRecipe" asp-route-id="@r.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this recipe?');">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+                <div class="d-flex align-items-center justify-content-center rounded" style="width: 40px; height: 40px; background-color: rgba(234, 67, 53, 0.1);">
+                    <i class="bi bi-exclamation-circle" style="color: #ea4335;"></i>
+                </div>
+                <span class="badge bg-danger-subtle text-danger rounded-pill">+2 New</span>
+            </div>
+            <h2 class="fw-bold mb-0">12</h2>
+            <div class="text-muted small">Pending Reports</div>
         </div>
     </div>
 </div>
+
+<div class="row g-4 mb-4">
+    <!-- Chart -->
+    <div class="col-md-8">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h6 class="fw-bold mb-0">Growth Analytics</h6>
+                <div class="d-flex gap-3 small">
+                    <div class="d-flex align-items-center gap-1"><i class="bi bi-circle-fill text-dark" style="font-size: 8px;"></i> New Users</div>
+                    <div class="d-flex align-items-center gap-1"><i class="bi bi-circle-fill" style="color: var(--admin-primary); font-size: 8px;"></i> New Recipes</div>
+                </div>
+            </div>
+            <canvas id="growthChart" height="250"></canvas>
+        </div>
+    </div>
+    
+    <!-- Activity -->
+    <div class="col-md-4">
+        <div class="stat-card h-100 d-flex flex-column">
+            <h6 class="fw-bold mb-4">Recent Activity</h6>
+            <div class="flex-grow-1">
+                <!-- Activity Items -->
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: rgba(221, 110, 53, 0.1);">
+                        <i class="bi bi-person-plus" style="color: var(--admin-primary); font-size: 0.8rem;"></i>
+                    </div>
+                    <div>
+                        <div class="small fw-semibold">New signup: Marco Rossi</div>
+                        <div class="text-muted" style="font-size: 0.7rem;">2 MINUTES AGO</div>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: rgba(66, 133, 244, 0.1);">
+                        <i class="bi bi-egg-fried" style="color: #4285f4; font-size: 0.8rem;"></i>
+                    </div>
+                    <div>
+                        <div class="small fw-semibold">New recipe: Spicy Penne</div>
+                        <div class="text-muted" style="font-size: 0.7rem;">15 MINUTES AGO</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-outline-secondary w-100 rounded-pill mt-3">View All Activity</button>
+        </div>
+    </div>
+</div>
+
+<!-- Most Liked Recipes (Top 5 Recent for now) -->
+<div class="stat-card p-0 overflow-hidden">
+    <div class="p-4 border-bottom d-flex align-items-center justify-content-between">
+        <h6 class="mb-0 fw-bold">Recent Recipes</h6>
+        <button class="btn btn-sm btn-light border rounded-pill">Export CSV</button>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-muted small text-uppercase">
+                <tr>
+                    <th class="ps-4" style="font-weight: 600;">Thumbnail</th>
+                    <th style="font-weight: 600;">Recipe Title</th>
+                    <th style="font-weight: 600;">Author</th>
+                    <th style="font-weight: 600;">Likes</th>
+                    <th class="text-end pe-4" style="font-weight: 600;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.RecentRecipes)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            <img src="@r.HeroImageUrl" class="rounded" width="48" height="40" style="object-fit:cover" />
+                        </td>
+                        <td class="fw-semibold">@r.Title</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="/files/default-avatar.png" class="rounded-circle" width="24" height="24" />
+                                <span class="small">@(r.Author?.DisplayName ?? "Unknown")</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="small" style="color: var(--admin-primary); font-weight: 600;">-</span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-link text-muted"><i class="bi bi-three-dots"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('growthChart').getContext('2d');
+            var growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7', 'Day 8', 'Day 9', 'Day 10', 'Day 11', 'Day 12', 'Day 13', 'Day 14'],
+                    datasets: [
+                        {
+                            label: 'New Users',
+                            data: [30, 45, 60, 40, 70, 65, 45, 80, 50, 60, 55, 75, 50, 40],
+                            borderColor: '#2c2520',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'New Recipes',
+                            data: [10, 15, 12, 20, 15, 25, 18, 15, 22, 10, 18, 25, 20, 15],
+                            borderColor: '#dd6e35',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false,
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

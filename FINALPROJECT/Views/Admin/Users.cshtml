@@ -1,0 +1,162 @@
+@model FINALPROJECT.ViewModels.Admin.AdminUsersViewModel
+@{
+    ViewData["Title"] = "Manage Users";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="admin-page-title mb-0">Manage Users</h1>
+                <p class="text-muted small">Monitor user activity, manage account statuses, and moderate community profiles.</p>
+            </div>
+            <button class="btn btn-dark rounded-pill px-3"><i class="bi bi-download me-1"></i> Export User Data</button>
+        </div>
+
+        <div class="stat-card mb-4 p-3 d-flex gap-3 align-items-center bg-light border-0">
+            <div class="input-group flex-grow-1" style="max-width: 400px;">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Search by name, email, or username...">
+            </div>
+            <select class="form-select w-auto"><option>All Statuses</option></select>
+            <select class="form-select w-auto"><option>Sort By: Newest</option></select>
+            <button class="btn btn-dark ms-auto"><i class="bi bi-sliders"></i></button>
+        </div>
+
+        <div class="stat-card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="text-muted small text-uppercase" style="font-size: 0.70rem;">
+                        <tr>
+                            <th class="ps-4">User Profile</th>
+                            <th>Email Address</th>
+                            <th>Recipes</th>
+                            <th>Join Date</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.85rem;">
+                        @foreach (var u in Model.Users)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="/files/default-avatar.png" class="rounded-circle" width="32" height="32" />
+                                        <div>
+                                            <div class="fw-bold text-dark">@u.DisplayName</div>
+                                            <div class="text-muted small">@u.UserName</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@u.Email</td>
+                                <td class="fw-semibold" style="color: var(--admin-primary)">@(u.Recipes?.Count ?? 0)</td>
+                                <td>
+                                    <div>@u.CreatedAt.ToString("MMM dd,")</div>
+                                    <div class="text-muted small">@u.CreatedAt.ToString("yyyy")</div>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-success" style="font-size: 0.75rem;">ACTIVE</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-light border rounded px-3 text-muted me-2" style="font-size: 0.7rem;">VIEW PROFILE</button>
+                                    <button class="btn btn-sm btn-link text-muted p-1"><i class="bi bi-ban"></i></button>
+                                    <button class="btn btn-sm btn-link text-muted p-1"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Mock -->
+            <div class="p-3 border-top d-flex justify-content-between align-items-center bg-light">
+                <div class="small text-muted">Showing <strong>1 - @(Math.Min(10, Model.TotalCount))</strong> of <strong>@Model.TotalCount.ToString("N0")</strong> users</div>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-light border">&lt;</button>
+                    <button class="btn btn-sm text-white border" style="background-color: var(--admin-primary);">1</button>
+                    <button class="btn btn-sm btn-light border">2</button>
+                    <button class="btn btn-sm btn-light border">3</button>
+                    <span class="px-2 text-muted">...</span>
+                    <button class="btn btn-sm btn-light border">&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Side Panel / Profile View Mockup -->
+    <div class="col-lg-4">
+        <div class="stat-card position-sticky" style="top: 2rem;">
+            <div class="d-flex justify-content-between mb-4">
+                <h6 class="fw-bold">User Profile</h6>
+                <button class="btn btn-sm btn-link text-muted p-0"><i class="bi bi-x-lg"></i></button>
+            </div>
+            
+            <div class="text-center mb-4">
+                <div class="position-relative d-inline-block mb-3">
+                    <img src="/files/default-avatar.png" class="rounded-circle border" width="80" height="80" />
+                    <div class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-white" style="width: 14px; height: 14px; right: 8px;"></div>
+                </div>
+                <h5 class="fw-bold mb-0">Emma Brown</h5>
+                <p class="text-muted small mb-2">emma.brown@example.com</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <span class="badge bg-danger-subtle text-danger rounded-pill" style="font-size: 0.65rem;">TOP CONTRIBUTOR</span>
+                    <span class="badge bg-info-subtle text-info rounded-pill" style="font-size: 0.65rem;">VERIFIED</span>
+                </div>
+            </div>
+            
+            <div class="row text-center mb-4 g-2">
+                <div class="col-4">
+                    <div class="border rounded p-2 bg-light">
+                        <div class="fw-bold fs-5">42</div>
+                        <div class="text-muted" style="font-size: 0.65rem; letter-spacing: 1px;">RECIPES</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="border rounded p-2 bg-light">
+                        <div class="fw-bold fs-5">1.2k</div>
+                        <div class="text-muted" style="font-size: 0.65rem; letter-spacing: 1px;">FOLLOWERS</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="border rounded p-2 bg-light">
+                        <div class="fw-bold fs-5">4.8</div>
+                        <div class="text-muted" style="font-size: 0.65rem; letter-spacing: 1px;">RATING</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-top border-bottom py-3 mb-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="fw-bold small">Account Status</div>
+                    <div class="text-muted" style="font-size: 0.70rem;">Suspend user to restrict platform access</div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" checked>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="fw-bold small">Recent Recipes</div>
+                    <a href="#" class="text-decoration-none small" style="color: var(--admin-primary);">View All</a>
+                </div>
+                
+                <!-- Mock Recipe item -->
+                <div class="d-flex align-items-center gap-3 mb-3 pb-2 border-bottom">
+                    <img src="/files/default-avatar.png" class="rounded" width="40" height="40" style="object-fit: cover;" />
+                    <div class="flex-grow-1">
+                        <div class="fw-bold text-dark" style="font-size: 0.85rem;">Creamy Tuscan Garlic Chicken</div>
+                        <div class="text-muted" style="font-size: 0.70rem;">Oct 12, 2023 &bull; 2.4k views</div>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted small"></i>
+                </div>
+            </div>
+
+            <button class="btn btn-dark w-100 rounded-pill mb-2 py-2"><i class="bi bi-envelope me-2"></i> Send Message</button>
+            <button class="btn btn-danger w-100 rounded-pill border-0 py-2" style="background-color: #fee2e2; color: #dc2626;"><i class="bi bi-exclamation-triangle me-2"></i> Flag for Review</button>
+        </div>
+    </div>
+</div>

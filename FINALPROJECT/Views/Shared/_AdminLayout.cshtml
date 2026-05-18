@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --admin-sidebar-bg: #1a1512;
+            --admin-sidebar-hover: #2a221d;
+            --admin-primary: #dd6e35;
+        }
+
+        body {
+            background-color: #fcf9f5;
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background-color: var(--admin-sidebar-bg);
+            color: #d1cbc5;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+        }
+        
+        .admin-main {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        .admin-brand {
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+            text-decoration: none;
+            padding: 1.5rem 1.5rem;
+            display: block;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #b5aead;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin: 0.25rem 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .admin-nav-item:hover, .admin-nav-item.active {
+            color: white;
+            background-color: var(--admin-sidebar-hover);
+        }
+        
+        .admin-nav-item.active {
+            background-color: var(--admin-primary);
+        }
+
+        .admin-nav-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .nav-section {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8c837b;
+            margin: 1.5rem 1.5rem 0.5rem;
+            font-weight: bold;
+        }
+
+        .admin-user {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .admin-page-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c2520;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0e9e1;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0e9e1;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar d-flex flex-column">
+            <a href="/admin" class="admin-brand">
+                <i class="bi bi-circle-fill" style="color: var(--admin-primary); font-size: 0.5rem; vertical-align: middle; margin-right: 5px;"></i>
+                Flavorly <br/>
+                <small class="text-muted" style="font-size: 0.65rem; font-weight: normal; letter-spacing: 1px; text-transform: uppercase;">Admin Panel</small>
+            </a>
+
+            <div class="mt-2">
+                <a href="/admin" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")">
+                    <i class="bi bi-graph-up admin-nav-icon"></i> Dashboard
+                </a>
+                
+                <a href="/admin/recipes" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Recipes" ? "active" : "")">
+                    <i class="bi bi-egg-fried admin-nav-icon"></i> Recipes
+                </a>
+                
+                <a href="/admin/videos" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Videos" ? "active" : "")">
+                    <i class="bi bi-play-btn admin-nav-icon"></i> Videos
+                </a>
+                
+                <a href="/admin/tips" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Tips" ? "active" : "")">
+                    <i class="bi bi-lightbulb admin-nav-icon"></i> Tips
+                </a>
+
+                <a href="/admin/collections" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Collections" ? "active" : "")">
+                    <i class="bi bi-collection admin-nav-icon"></i> Collections
+                </a>
+
+                <div class="nav-section">Management</div>
+
+                <a href="/admin/users" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Users" ? "active" : "")">
+                    <i class="bi bi-people admin-nav-icon"></i> Users
+                </a>
+
+                <a href="/admin/reviews" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Reviews" ? "active" : "")">
+                    <i class="bi bi-chat-square-dots admin-nav-icon"></i> Reviews & Reports
+                </a>
+
+                <a href="/admin/analytics" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Analytics" ? "active" : "")">
+                    <i class="bi bi-pie-chart admin-nav-icon"></i> Analytics
+                </a>
+
+                <a href="/admin/settings" class="admin-nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Settings" ? "active" : "")">
+                    <i class="bi bi-gear admin-nav-icon"></i> Settings
+                </a>
+            </div>
+
+            <div class="admin-user d-flex align-items-center">
+                <img src="/files/default-avatar.png" class="rounded-circle me-3" width="36" height="36" alt="Profile" />
+                <div class="flex-grow-1 overflow-hidden">
+                    <div class="text-white text-truncate fw-bold" style="font-size: 0.85rem;">@User.Identity?.Name</div>
+                    <div class="text-muted" style="font-size: 0.70rem;">Administrator</div>
+                </div>
+                <form class="form-inline" asp-area="" asp-controller="Account" asp-action="Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="btn btn-link text-muted p-0 ms-2" title="Logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-main flex-grow-1 p-4 pb-5">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
