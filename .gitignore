@@ -38,3 +38,17 @@ ehthumbs.db
 
 # Folder config file
 Desktop.ini
+
+# SQLite databases
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets / Production config
+appsettings.Production.json
+appsettings.local.json
+
+# User Uploads
+**/wwwroot/uploads/
+**/wwwroot/images/uploads/
+publish/

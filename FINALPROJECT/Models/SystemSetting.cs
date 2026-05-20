@@ -25,14 +25,14 @@ namespace FINALPROJECT.Models
 
         // Email (SMTP) Settings
         [StringLength(200)]
-        public string SmtpHost { get; set; }
+        public string? SmtpHost { get; set; }
 
         public int SmtpPort { get; set; } = 587;
 
         [StringLength(100)]
-        public string SmtpUsername { get; set; }
+        public string? SmtpUsername { get; set; }
 
         [StringLength(100)]
-        public string SmtpPassword { get; set; }
+        public string? SmtpPassword { get; set; }
     }
 }

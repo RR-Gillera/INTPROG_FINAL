@@ -6,9 +6,19 @@
 @if (SignInManager.IsSignedIn(User))
 {
     var currentUser = await UserManager.GetUserAsync(User);
+    if (currentUser == null)
+    {
+        // Stale cookie — user no longer exists in DB; sign them out to clear it
+        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline m-0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Session Expired — Sign In</button>
+        </form>
+    }
+    else
+    {
     <div class="d-flex align-items-center gap-2">
-        <a asp-controller="Profile" asp-action="Index" asp-route-username="@currentUser!.UserName" class="d-flex align-items-center gap-2 text-decoration-none">
-            <img src="@currentUser!.AvatarUrl" class="rounded-circle" width="34" height="34" style="object-fit:cover;" alt="avatar" onerror="this.src='/images/default-avatar.png'" />
+        <a asp-controller="Profile" asp-action="Index" asp-route-username="@currentUser.UserName" class="d-flex align-items-center gap-2 text-decoration-none">
+            <img src="@currentUser.AvatarUrl" class="rounded-circle" width="34" height="34" style="object-fit:cover;" alt="avatar" onerror="this.src='/images/default-avatar.png'" />
             <span class="nav-username d-none d-lg-inline">@currentUser.DisplayName</span>
         </a>
         @if (User.IsInRole("Admin"))
@@ -20,6 +30,7 @@
             <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Sign Out</button>
         </form>
     </div>
+    }
 }
 else
 {

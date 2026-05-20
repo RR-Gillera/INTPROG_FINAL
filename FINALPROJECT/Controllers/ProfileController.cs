@@ -5,6 +5,7 @@ using FINALPROJECT.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FINALPROJECT.Controllers
 {
@@ -60,6 +61,7 @@ namespace FINALPROJECT.Controllers
         }
 
         [HttpPost("{username}/follow")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Follow(string username)
         {

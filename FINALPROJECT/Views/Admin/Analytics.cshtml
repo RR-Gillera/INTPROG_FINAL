@@ -133,16 +133,20 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            var growthLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GrowthLabels));
+            var monthlyUsersData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyUsers));
+            var monthlyRecipesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRecipes));
+
             // Community Growth Line Chart
             var ctxGrowth = document.getElementById('communityGrowthChart').getContext('2d');
             new Chart(ctxGrowth, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: growthLabels,
                     datasets: [
                         {
                             label: 'Users',
-                            data: [450, 600, 850, 950, 1200, 1550],
+                            data: monthlyUsersData,
                             borderColor: '#dd6e35',
                             backgroundColor: 'transparent',
                             borderWidth: 3,
@@ -152,7 +156,7 @@
                         },
                         {
                             label: 'Recipes',
-                            data: [150, 200, 250, 200, 300, 420],
+                            data: monthlyRecipesData,
                             borderColor: '#2c2520',
                             backgroundColor: 'transparent',
                             borderWidth: 3,
@@ -167,7 +171,7 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, grid: { borderDashOffset: [2, 4], color: '#f0e9e1' }, border: { display: false } },
+                        y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f0e9e1' }, border: { display: false } },
                         x: { grid: { display: false }, border: { display: false } }
                     }
                 }
@@ -178,10 +182,10 @@
             new Chart(ctxDiff, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Medium', 'Easy', 'Advanced', 'Expert'],
+                    labels: ['Easy', 'Medium', 'Advanced'],
                     datasets: [{
-                        data: [45, 30, 15, 10],
-                        backgroundColor: ['#20c997', '#dd6e35', '#2c2520', '#e9ecef'],
+                        data: [@Model.EasyCount, @Model.MediumCount, @Model.AdvancedCount],
+                        backgroundColor: ['#20c997', '#dd6e35', '#2c2520'],
                         borderWidth: 0,
                         cutout: '65%'
                     }]
@@ -196,13 +200,16 @@
             });
 
             // Categories Bar Chart
+            var categoryLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryLabels));
+            var categoryCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryCounts));
+
             var ctxCat = document.getElementById('categoryChart').getContext('2d');
             new Chart(ctxCat, {
                 type: 'bar',
                 data: {
-                    labels: ['Italian', 'Mexican', 'Asian', 'Desserts', 'Breads', 'Healthy', 'Sea Food', 'Beverages'],
+                    labels: categoryLabels,
                     datasets: [{
-                        data: [340, 220, 290, 160, 100, 260, 130, 90],
+                        data: categoryCounts,
                         backgroundColor: '#dd6e35',
                         borderRadius: 2
                     }]
@@ -212,7 +219,7 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: '#f0e9e1' }, border: { display: false } },
+                        y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f0e9e1' }, border: { display: false } },
                         x: { grid: { display: false }, border: { display: false } }
                     }
                 }

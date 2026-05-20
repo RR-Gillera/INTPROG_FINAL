@@ -11,20 +11,20 @@ namespace FINALPROJECT.Models
 
         [Required]
         [StringLength(50)]
-        public string ContentType { get; set; } // "Recipe", "Video", "User", "Review"
+        public string ContentType { get; set; } = null!; // "Recipe", "Video", "User", "Review"
 
         [Required]
-        public string ContentId { get; set; } // String to handle string IDs if necessary, or int
+        public string ContentId { get; set; } = null!; // String to handle string IDs if necessary, or int
 
         [Required]
-        public string ReportedById { get; set; }
+        public string ReportedById { get; set; } = null!;
 
         [ForeignKey("ReportedById")]
-        public virtual User ReportedBy { get; set; }
+        public virtual User? ReportedBy { get; set; }
 
         [Required]
         [StringLength(500)]
-        public string Reason { get; set; }
+        public string Reason { get; set; } = null!;
 
         [Required]
         [StringLength(20)]
