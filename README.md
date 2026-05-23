@@ -136,5 +136,3 @@ INTPROG_FINAL-main/
 │     ├─ lib/    (third-party libs like bootstrap, jquery)
 │     └─ uploads/ (user-uploaded media)
 ```
-
-This is a condensed view — let me know if you want a full recursive listing or a Markdown table with file counts per folder.
